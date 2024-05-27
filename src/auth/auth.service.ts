@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { CreateAuthDto, Role } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Auth } from './entities/auth.entity';
@@ -13,10 +13,22 @@ export class AuthService {
     @InjectRepository(Auth)
     private authRepository:Repository<Auth>,
   ){}
-  async create(username:string,password:string) {
-    const newHash:string = await hashPassword(password);
-    const user = await this.authRepository.create({username,password:newHash})
-    return this.authRepository.save(user);
+  @HttpCode(HttpStatus.CREATED)
+  async create(username: string, password: string, roles?: Role[]): Promise<{ message: string,status?:any }> {
+    try {
+      const existingUser = await this.authRepository.findOne({ where: { username } });
+      
+      if (existingUser) {
+        return {message:'Username already exists',status: HttpStatus.CONFLICT};
+      }
+      const newHash: string = await hashPassword(password);
+      const userRoles: Role[] = roles && roles.length > 0 ? roles : [Role.USER];
+      const user =this.authRepository.create({ username, password: newHash, roles: userRoles });
+      await this.authRepository.save(user);
+      return { message: 'User created successfully' };
+    } catch (error) {
+      throw new HttpException('Error creating user', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async login(){

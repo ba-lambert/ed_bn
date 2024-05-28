@@ -1,7 +1,9 @@
 import { IsNotEmpty, IsString } from "class-validator";
+import { CreateAuthDto } from "src/auth/dto/create-auth.dto";
 
-export class CreateUserDto {
-  @IsNotEmpty()
-  @IsString()
-  fullName: string;
+export class createUserDto {
+  firstName: string;
+  lastName: string;
+  age: number;
+  auth: CreateAuthDto;
 }

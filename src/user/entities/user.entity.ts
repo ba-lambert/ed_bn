@@ -9,8 +9,13 @@ export class User {
   id: number;
 
   @Column()
+  fullnames:string;
+
+  @Column()
+  phone:Number;
+
+  @Column()
   fullName: string;
   @OneToOne(() => Auth, auth => auth.profile)
-  @JoinColumn()
   auth: Auth;
 }

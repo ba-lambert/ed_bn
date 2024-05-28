@@ -1,4 +1,4 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn,OneToOne } from "typeorm";
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn,OneToOne, JoinColumn } from "typeorm";
 import { v4 as uuid } from 'uuid';
 import { Role } from "../dto/create-auth.dto";
 import { User } from "src/user/entities/user.entity";
@@ -19,6 +19,7 @@ export class Auth {
   })
   roles: Role[];
   @OneToOne(()=>User,profile => profile.auth)
+  @JoinColumn()
   profile:User;
   
   @BeforeInsert()
